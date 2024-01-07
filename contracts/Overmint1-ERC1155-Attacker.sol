@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.15;
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 import "./Overmint1-ERC1155.sol";
 
@@ -44,6 +41,6 @@ contract Overmint1_ERC1155_Attacker is IERC1155Receiver {
     }
 
     function supportsInterface(bytes4 interfaceId) external view returns (bool) {
-        return true;
+        return type(IERC1155Receiver).interfaceId == interfaceId;
     }
 }
