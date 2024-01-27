@@ -179,3 +179,9 @@ contract Democracy is Ownable, ERC721 {
         votes[challenger] = 3;
     }
 }
+
+contract DemocracyAttacker {
+    receive () external payable {
+        
+    }
+}

