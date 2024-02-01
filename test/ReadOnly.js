@@ -42,8 +42,16 @@ describe(NAME, function () {
 
         // prettier-ignore
         it("conduct your attack here", async function () {
-    
-    });
+            const ReadOnlyAttackerFactory = await ethers.getContractFactory("ReadOnlyAttacker");
+            const readOnlyAttackerContract = await ReadOnlyAttackerFactory
+                .connect(attackerWallet)
+                .deploy(
+                    readOnlyContract.address,
+                    vulnerableDeFiContract.address,
+                    {value: ethers.utils.parseEther("1.8")}
+                );
+            await readOnlyAttackerContract.connect(attackerWallet).attack();
+        });
 
         after(async function () {
             console.log(await vulnerableDeFiContract.lpTokenPrice());

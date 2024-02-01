@@ -25,7 +25,8 @@ describe(NAME, function () {
         })
 
         it("conduct your attack here", async function () {
-
+            const AttackFactory = await ethers.getContractFactory("Overmint3Attacker");
+            await AttackFactory.connect(attackerWallet).deploy(victimContract.address, attackerWallet.address);
         });
 
         after(async function () {
